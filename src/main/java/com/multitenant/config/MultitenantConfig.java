@@ -1,6 +1,7 @@
 package com.multitenant.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,14 +18,18 @@ import java.util.Map;
 import java.util.Properties;
 
 @Configuration
-public class MultiTenantConfig {
-    @Value("${defaultTenant}")
+public class MultitenantConfig {
+    @Value("${tenant.default}")
     private String defaultTenant;
+
+    @Value("${tenant.file.path}")
+    private String filePath;
 
     @Bean
     @ConfigurationProperties(prefix = "tenants")
+    @RefreshScope
     public DataSource dataSource() {
-        File[] files = Paths.get("src/main/all_tenants").toFile().listFiles();
+        File[] files = Paths.get(filePath).toFile().listFiles();
         Map<Object, Object> resolvedDataSources = new HashMap<>();
 
         if (files != null) {
